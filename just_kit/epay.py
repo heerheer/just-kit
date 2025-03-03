@@ -97,8 +97,8 @@ class EpayOperator(ServieProvider):
         for p in p_tags:
             text = p.get_text(strip=True)
             if '账户余额' in text:
-                account_balance = text.split('：').replace('元', '')
+                account_balance = text.split('：')[1].replace('元', '')
             elif '浴室专款' in text:
-                bathroom_funds = text.split('：').replace('元', '')
+                bathroom_funds = text.split('：')[1].replace('元', '')
 
         return account_balance, bathroom_funds

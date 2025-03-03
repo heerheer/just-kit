@@ -42,6 +42,9 @@ class Authenticator:
         self.auto_login=auto_login
         if auto_login:
             self.load_cookies()  # 初始化时尝试加载cookie
+            if not self.check():
+                self.expire() # 自动登入失败
+                
         
     def save_cookies(self):
         """保存cookies到文件"""
