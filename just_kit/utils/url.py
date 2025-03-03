@@ -17,3 +17,12 @@ def get_host_from_url(url):
     '''
     parsed_url = urlparse(url)
     return parsed_url.netloc  # 返回主机名（Host）
+
+def abs_url(service,path):
+    '''
+    拼接绝对URL
+    '''
+    if path.startswith('/'):
+        return f"{get_origin(service)}{path}"
+    else:
+        return path

@@ -10,11 +10,12 @@ class Authenticator:
     '''
     用于登录信息门户的类
     '''
-    def __init__(self, service: str, debug=False):
+    def __init__(self, service: str, debug=False,auto_login=True):
         '''
         初始化函数
         :param service: 登录的服务
         :param debug: 是否开启调试模式
+        :param auto_login: 是否自动读取保存的cookies以快速登录
         '''
         self.logger = logging.getLogger(__name__)
         if debug:
@@ -38,7 +39,9 @@ class Authenticator:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0",
         }
         self.ignore_cookies = ['Location']  # 要忽略的 cookie 名列表
-        self.load_cookies()  # 初始化时尝试加载cookie
+        self.auto_login=auto_login
+        if auto_login:
+            self.load_cookies()  # 初始化时尝试加载cookie
         
     def save_cookies(self):
         """保存cookies到文件"""
@@ -106,29 +109,32 @@ class Authenticator:
         :param password: 密码
         """
         with self.session as session:
-            self.headers['HOST'] = utils.get_host_from_url(self.service)
+            self.headers['HOST'] = get_host_from_url(self.service)
             # 直接访问service并得到跳转地址
             res = session.get(
                 self.service,
                 headers=self.headers,
                 allow_redirects=False,
             )
+            print( res.cookies.get_dict())
             # 该服务登入地址
             target = res.headers["Location"]
             # debug
-            self.logger.debug(res.status_code, '->', target)
+            self.logger.debug(f"---第一次访问---")
+            self.logger.debug(f"{res.status_code}->{target}")
             self.logger.debug(res.headers)
             self.logger.debug(session.cookies.get_dict())
             # 在跳转时要重置HOST和Origin防止404
-            self.headers['HOST'] = utils.get_host_from_url(target)
-            self.headers["Origin"] = utils.get_origin(target)
+            self.headers['HOST'] = get_host_from_url(target)
+            self.headers["Origin"] = get_origin(target)
+
             res = session.get(
-                target,
+                abs_url(self.service,target),
                 headers=self.headers,
                 allow_redirects=False,
             )
             # debug
-            self.logger.debug(res.status_code, '->', target)
+            self.logger.debug(f"{res.status_code}->{target}")
             self.logger.debug(res.headers)
             self.logger.debug(session.cookies.get_dict())
             # find execution
@@ -141,7 +147,7 @@ class Authenticator:
             # login data construct
             data = {
                 "username": account,
-                "password": self.encrypt_with_node(password),
+                "password": self.encrypt_with_js(password),
                 "_eventId": "submit",
                 "submit": "登+录",
                 "encrypted": "true",
@@ -155,17 +161,17 @@ class Authenticator:
                 data=data,
                 allow_redirects=False)
             if res.status_code == 302:
-                self.logger.log("登入成功")
+                self.logger.info("登入成功")
                 self.save_cookies()
                 target = res.headers["Location"]
                 # debug
-                self.logger.debug(res.status_code, '->', target)
+                self.logger.debug(f"{res.status_code}->{target}")
                 self.logger.debug(session.cookies.get_dict())
-                self.headers["Origin"] = utils.get_origin(target)
-                self.headers['HOST'] = utils.get_host_from_url(target)
+                self.headers["Origin"] = get_origin(target)
+                self.headers['HOST'] = get_host_from_url(target)
                 # last
                 res = session.get(
-                    target,
+                    abs_url(self.service,target),
                     headers=self.headers,
                     allow_redirects=False)
                 # debug
