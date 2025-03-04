@@ -5,6 +5,7 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 from .utils import *
+from typing import Optional
 
 class Authenticator:
     '''
@@ -66,14 +67,14 @@ class Authenticator:
                     if name not in self.ignore_cookies:
                         self.session.cookies.set(name, value)
 
-    def jsessionid(self):
+    def jsessionid(self)->Optional[str]:
         '''
         获取JSESSIONID,如果有JSESSIONID返回,否则返回None
         '''
         d = self.session.cookies
         return d["JSESSIONID"] if 'JSESSIONID' in d else None
 
-    def encrypt_with_js(self, password):
+    def encrypt_with_js(self, password) -> Optional[str]:
 
         """
         使用 js 脚本加密数据
@@ -198,7 +199,7 @@ class Authenticator:
         if os.path.exists(self.cookie_file):
             os.remove(self.cookie_file)
 
-    def check(self):
+    def check(self) -> bool:
         """
         检查登录是否失效
         :return: 如果登录有效返回True,否则返回False

@@ -75,10 +75,11 @@ class EpayOperator(ServieProvider):
             self.logger.error(f"解析响应失败: {e}")
             return None
 
-    def query_account_bill(self):
+    def query_account_bill(self)->tuple[Optional[float],Optional[float]]:
 
         '''
         查询账户余额和浴室专款
+        :return: 账户余额,浴室专款
         '''
         html_content= self.auth.session.get(f"{self.SERVICE_URL}/myepay/index").text
 
@@ -97,8 +98,8 @@ class EpayOperator(ServieProvider):
         for p in p_tags:
             text = p.get_text(strip=True)
             if '账户余额' in text:
-                account_balance = text.split('：')[1].replace('元', '')
+                account_balance = float(text.split('：')[1].replace('元', ''))
             elif '浴室专款' in text:
-                bathroom_funds = text.split('：')[1].replace('元', '')
+                bathroom_funds = float(text.split('：')[1].replace('元', ''))
 
         return account_balance, bathroom_funds
