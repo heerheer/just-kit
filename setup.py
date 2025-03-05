@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="just-kit",
+    name="just_kit",
     version="0.1.0",
     packages=find_packages(exclude=['just_kit.utils*']),
     install_requires=[
