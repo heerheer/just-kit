@@ -11,10 +11,10 @@ class Authenticator:
     '''
     用于登录信息门户的类
     '''
-    def __init__(self, service: str, debug=False,auto_login=True):
+    def __init__(self, service: str = "http://my.just.edu.cn/", debug=False,auto_login=True):
         '''
         初始化函数
-        :param service: 登录的服务
+        :param service: 登录的服务,推荐使用默认值 http://my.just.edu.cn/
         :param debug: 是否开启调试模式
         :param auto_login: 是否自动读取保存的cookies以快速登录
         '''
@@ -45,8 +45,7 @@ class Authenticator:
             self.load_cookies()  # 初始化时尝试加载cookie
             if not self.check():
                 self.expire() # 自动登入失败
-                
-        
+
     def save_cookies(self):
         """保存cookies到文件"""
         filtered_cookies = {
@@ -106,13 +105,19 @@ class Authenticator:
         except Exception as e:
             self.logger.error(f"Error executing JavaScript: {e}")
             return None
+    
     def login(self, account: str, password: str):
+
+        if self.check():
+            return
+
         """
         接受账户和密码进行登录
         :param account: 账户
         :param password: 密码
         """
         with self.session as session:
+
             self.headers['HOST'] = get_host_from_url(self.service)
             # 直接访问service并得到跳转地址
             res = session.get(
@@ -184,7 +189,7 @@ class Authenticator:
                 # 如果有跳转则输出跳转地址
                 if res.status_code == 302:
                     target = res.headers["Location"]
-                    self.logger.debug('->', target)
+                    self.logger.debug('->'+target)
             else:
                 self.logger.error("登录失败")
                 return -1
@@ -206,7 +211,6 @@ class Authenticator:
         """
         res = self.session.get(
             self.service,
-            headers=self.headers,
             allow_redirects=False,
         )
         if res.status_code == 302:

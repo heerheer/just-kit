@@ -1,11 +1,11 @@
 import requests
 import logging
 from typing import Optional
-from .auth import Authenticator
-from .service import ServieProvider
+from ..auth import Authenticator
+from ..services.service import ServieProvider
 from bs4 import BeautifulSoup
 
-class EpayOperator(ServieProvider):
+class EpayServiceProvider(ServieProvider):
     """
     用于查询账单信息的类
     """
@@ -27,6 +27,9 @@ class EpayOperator(ServieProvider):
         """
         return cls.SERVICE_URL
 
+    def login(self):
+        self.session.get(EpayOperator.SERVICE_URL)
+
     def query_electric_bill(self, room_no: int =4372, sys_id: int = 2, 
                           elc_area: int = 2, elc_buis: int = 4355) -> Optional[float]:
         """
@@ -38,15 +41,6 @@ class EpayOperator(ServieProvider):
         :return: 剩余电量,查询失败返回None
         """
         url = f"{self.SERVICE_URL}/electric/queryelectricbill"
-        jsessionid = self.auth.jsessionid()
-        
-        if not jsessionid:
-            self.logger.error("未获取到有效的JSESSIONID，请先登录")
-            return None
-
-        headers = {
-            "Cookie": f'JSESSIONID={jsessionid}'
-        }
         
         data = {
             "sysid": sys_id,
@@ -56,7 +50,7 @@ class EpayOperator(ServieProvider):
         }
         
         try:
-            response = requests.post(url, headers=headers, data=data)
+            response = self.session.post(url, data=data)
             response.raise_for_status()
             result = response.json()
             
