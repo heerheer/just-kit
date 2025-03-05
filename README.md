@@ -17,11 +17,37 @@ pip install just-kit
 
 ## 使用方法
 
-具体使用方法将在功能开发完成后更新。
+### 登入
+默认使用信息门户作为登入服务
+```python
+from just_kit.auth import Authenticator
+import os
+from dotenv import load_dotenv
+# 读取.env
+load_dotenv()
+# 读取账户以及密码
+username = os.getenv('USER')
+password = os.getenv('PASSWORD')
+# 初始化认证器
+authenticator = Authenticator()
+authenticator.login(username,password)
+```
+
+### 服务:Epay
+epay服务用于获取宿舍电费、用户校园卡余额和浴室专款
+```python
+from just_kit.services import *
+# 认证器作为构造参数
+epay = EpayServiceProvider(authenticator)
+# 通过oauth登入epay的服务
+epay.login()
+# 获取本账户校园卡余额与浴室专款
+epay.query_account_bill()
+```
 
 ## 开发说明
 
-本项目使用Python 3.6+开发，主要依赖：
+本项目使用Python 3.11开发，主要依赖：
 - requests：用于发送HTTP请求
 - beautifulsoup4：用于解析HTML
 
