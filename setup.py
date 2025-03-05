@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="just_kit",
-    version="0.1.1",
+    version="0.1.2",
     packages=find_packages(),
     install_requires=[
         'requests',  # 用于发送HTTP请求
