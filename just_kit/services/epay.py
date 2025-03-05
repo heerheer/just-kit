@@ -28,7 +28,7 @@ class EpayServiceProvider(ServieProvider):
         return cls.SERVICE_URL
 
     def login(self):
-        self.session.get(EpayOperator.SERVICE_URL)
+        self.session.get(self.SERVICE_URL)
 
     def query_electric_bill(self, room_no: int =4372, sys_id: int = 2, 
                           elc_area: int = 2, elc_buis: int = 4355) -> Optional[float]:
