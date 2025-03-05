@@ -1,34 +1,25 @@
-from dotenv import load_dotenv
-import os
-from bs4 import BeautifulSoup
-import requests
-
-# 导入这个包
 from just_kit.auth import Authenticator
-from just_kit.epay import EpayOperator
+from just_kit.services import *
+from just_kit.utils import decrypt2
+import os,json
 
-
-# 加载 .env 文件中的环境变量
+from dotenv import load_dotenv
 load_dotenv()
-
 username = os.getenv('USER')
 password = os.getenv('PASSWORD')
 
+auther = Authenticator()
+yjskb = GraduateServiceProvider(auther)
+epay = EpayServiceProvider(auther)
+auther.login(username,password)
 
-
-auther = Authenticator(EpayOperator.SERVICE_URL,debug=True)
-epay = EpayOperator(auth=auther)
-
-if not auther.check():
-    auther.login(username, password)
-    if auther.check():
-        print("登录成功")
-    else:
-        print("登录失败")
-        quit()
-
-print(epay.query_electric_bill())
-account_balance, bathroom_funds = epay.query_account_bill()
-print(f"账户余额: {account_balance}")
-print(f"专项额度: {bathroom_funds}")
+yjskb.login()
+term = yjskb.terms()[0]['termcode']
+print('---------------')
+courses = yjskb.courses(term)
+print('---------------')
+print(json.dumps(courses,ensure_ascii=False))
+print('---------------')
+epay.login()
+print(epay.query_account_bill())
 
