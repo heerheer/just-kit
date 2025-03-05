@@ -9,6 +9,7 @@ setup(
         'beautifulsoup4',  # 用于解析HTML
         'dotenv',
         'PyExecJS',  # 用于执行JavaScript代码
+        'pycryptodome'
     ],
     author="Harmog",
     author_email="harmog@foxmail.com",
