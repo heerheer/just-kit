@@ -45,6 +45,31 @@ epay.login()
 epay.query_account_bill()
 ```
 
+
+### 服务:HealthCheck
+宿舍卫生检查分数查询服务
+```python
+import os
+from just_kit.auth import Authenticator
+
+import dotenv
+dotenv.load_dotenv()
+
+auther = Authenticator(vpn=True) #开启VPN模式
+
+auther.login(
+    account=os.getenv("USER"),
+    password=os.getenv("PASSWORD"))
+
+from just_kit.services import HealthCheckService
+service = HealthCheckService(auther)
+service.login()
+# 获取最近宿舍卫生检查分数
+service.get_health_check_data()
+# 获取 [HealthCheckData]
+# 包含socre和date属性
+```
+
 ## 开发说明
 
 本项目使用Python 3.11开发，主要依赖：
