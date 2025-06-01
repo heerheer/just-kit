@@ -25,6 +25,8 @@ ENV/
 .coverage
 htmlcov/
 test.ipynb
+# Jupyter notebooks
+*.ipynb
 
 # Cookies
 .cookies_*
