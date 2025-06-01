@@ -2,14 +2,17 @@ import requests
 import logging
 from typing import Optional
 from ..auth import Authenticator
-from ..services.service import ServieProvider
+from .service import ServieProvider
 from bs4 import BeautifulSoup
+
+
 
 class EpayServiceProvider(ServieProvider):
     """
     用于查询账单信息的类
     """
     SERVICE_URL = "http://202.195.206.214/epay/"
+    SERVICE_URL_VPN = "https://client.v.just.edu.cn/http/webvpn90bb547feb721c9a7d03a4a9a66062f4/epay/"
 
     def __init__(self, auth:Authenticator):
         """
@@ -17,18 +20,12 @@ class EpayServiceProvider(ServieProvider):
         :param auth: Authenticator实例
         """
         super().__init__(auth)
-        
 
-    @classmethod
-    def get_service_url(cls) -> str:
-        """
-        获取服务地址
-        :return: 服务的URL
-        """
-        return cls.SERVICE_URL
+    def service_url(self) -> str:
+        return self.SERVICE_URL_VPN if self.auth.vpn else self.SERVICE_URL
 
     def login(self):
-        self.session.get(self.SERVICE_URL)
+        self.session.get(self.service_url())
 
     def query_electric_bill(self, room_no: int =4372, sys_id: int = 2, 
                           elc_area: int = 2, elc_buis: int = 4355) -> Optional[float]:
@@ -40,7 +37,7 @@ class EpayServiceProvider(ServieProvider):
         :param elc_buis: 电力业务ID
         :return: 剩余电量,查询失败返回None
         """
-        url = f"{self.SERVICE_URL}/electric/queryelectricbill"
+        url = f"{self.service_url()}/electric/queryelectricbill"
         
         data = {
             "sysid": sys_id,
@@ -75,7 +72,7 @@ class EpayServiceProvider(ServieProvider):
         查询账户余额和浴室专款
         :return: 账户余额,浴室专款
         '''
-        html_content= self.auth.session.get(f"{self.SERVICE_URL}/myepay/index").text
+        html_content= self.auth.session.get(f"{self.service_url()}/myepay/index").text
 
         # 解析HTML
         soup = BeautifulSoup(html_content, 'html.parser')
