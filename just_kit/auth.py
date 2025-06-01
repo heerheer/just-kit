@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 from .utils import *
 from typing import Optional
+from .utils.rsa import encrypt
 
 class Authenticator:
     '''
@@ -17,7 +18,7 @@ class Authenticator:
         :param service: 登录的服务,推荐使用默认值 http://my.just.edu.cn/
         :param debug: 是否开启调试模式
         :param auto_login: 是否自动读取保存的cookies以快速登录
-        :param vpn: 是否使用vpn,若使用则会service使用ids2.just.edu.cn
+        :param vpn: 是否使用vpn,若使用则会service使用 https://vpn2.just.edu.cn/
         '''
         self.logger = logging.getLogger(__name__)
         if debug:
@@ -27,14 +28,16 @@ class Authenticator:
             )
         else:
             logging.basicConfig(level=logging.INFO)
+
+        # 基础信息
+        self.vpn = vpn
         # 用于储存登入后的一些数据
-        self.service = 'https://ids.v.just.edu.cn/' if vpn else service
+        self.service = 'https://vpn2.just.edu.cn' if vpn else service
         self.login_data = {}
         self.session = requests.Session()
         self.cookie_file = ".cookies_" + \
             self.service.replace('http://', "").replace('/', '_') + ".pkl"  # 根据service生成唯一的cookie文件名
         self.headers = {
-            "Host": "ids2.just.edu.cn",
             "Connection": "keep-alive",
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -76,17 +79,18 @@ class Authenticator:
 
     @staticmethod
     def encrypt_with_js(password) -> str:
-        import utils.rsa as rsa
+
         """
         使用 与js脚本一直的方式进行加密数据
         :param password: 要加密的密码
         :return: 加密后的数据
         """
-        return rsa.encrypt(password)
+        return encrypt(password)
 
     def login(self, account: str, password: str):
 
         if self.check():
+            self.logger.info("已登录")
             return
 
         """
@@ -96,13 +100,13 @@ class Authenticator:
         """
         with self.session as session:
 
-            self.headers['HOST'] = get_host_from_url(self.service)
             # 直接访问service进行自动跳转?
             res = session.get(
                 self.service,
                 allow_redirects=True,
             )
             target = res.url
+
             # find execution
             soup = BeautifulSoup(res.text, "html.parser")
             execution_input = soup.find("input", {"name": "execution"})
@@ -110,6 +114,7 @@ class Authenticator:
                 execution_value = execution_input.get("value")
             else:
                 self.logger.error("未找到名为execution的input元素")
+
             # login data construct
             data = {
                 "username": account,
@@ -120,33 +125,30 @@ class Authenticator:
                 "loginType": "1",
                 "execution": execution_value,
             }
+
             # login
             res = session.post(
                 target,
-                headers=self.headers,
                 data=data,
                 allow_redirects=False)
+
             if res.status_code == 302:
                 self.logger.info("登入成功")
                 self.save_cookies()
                 target = res.headers["Location"]
+
                 # debug
-                self.logger.debug(f"{res.status_code}->{target}")
+                self.logger.debug(f"{res.status_code}->{abs_url(self.service,target)}")
                 self.logger.debug(session.cookies.get_dict())
-                self.headers["Origin"] = get_origin(target)
-                self.headers['HOST'] = get_host_from_url(target)
-                # last
+
                 res = session.get(
                     abs_url(self.service,target),
-                    headers=self.headers,
-                    allow_redirects=False)
+                )
+
                 # debug
                 self.logger.debug(res.status_code)
                 self.logger.debug(session.cookies.get_dict())
-                # 如果有跳转则输出跳转地址
-                if res.status_code == 302:
-                    target = res.headers["Location"]
-                    self.logger.debug('->'+target)
+
             else:
                 self.logger.error("登录失败")
                 return -1
@@ -170,7 +172,7 @@ class Authenticator:
             self.service,
             allow_redirects=False,
         )
-        if res.status_code == 302:
+        if res.status_code == 302 or res.status_code == 301:
             return False
         else:
             return True

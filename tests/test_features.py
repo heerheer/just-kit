@@ -8,18 +8,13 @@ load_dotenv()
 username = os.getenv('USER')
 password = os.getenv('PASSWORD')
 
-auther = Authenticator()
-yjskb = GraduateServiceProvider(auther)
+auther = Authenticator(vpn=True,auto_login=False)
+
 epay = EpayServiceProvider(auther)
 auther.login(username,password)
 
-yjskb.login()
-term = yjskb.terms()[0]['termcode']
-print('---------------')
-courses = yjskb.courses(term)
-print('---------------')
-print(json.dumps(courses,ensure_ascii=False))
-print('---------------')
+print(f'auther:{auther.check()}')
+
 epay.login()
-print(epay.query_account_bill())
+print(epay.query_electric_bill())
 

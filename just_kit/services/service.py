@@ -29,3 +29,9 @@ class ServieProvider:
             return False
         else:
             return True
+
+    def service_url(self)->str:
+        """
+        获取服务地址
+        """
+        pass

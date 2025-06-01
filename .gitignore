@@ -24,6 +24,7 @@ ENV/
 .pytest_cache/
 .coverage
 htmlcov/
+tests/
 test.ipynb
 # Jupyter notebooks
 *.ipynb
