@@ -1,10 +1,10 @@
-import requests
-import logging
 from typing import Optional
-from ..auth import Authenticator
-from .service import ServieProvider
+
+import requests
 from bs4 import BeautifulSoup
 
+from .service import ServieProvider
+from ..auth import Authenticator
 
 
 class EpayServiceProvider(ServieProvider):

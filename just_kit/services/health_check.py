@@ -1,11 +1,9 @@
-from attr import dataclass
-
-from ..auth import Authenticator
-import logging
 import json
 import re
+from dataclasses import dataclass
+
 from .service import ServieProvider
-from ..utils import *
+from just_kit.auth import Authenticator
 
 
 @dataclass

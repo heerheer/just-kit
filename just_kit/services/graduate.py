@@ -1,5 +1,5 @@
-from ..services.service import ServieProvider
-from ..auth import Authenticator
+from just_kit.services.service import ServieProvider
+from just_kit.auth import Authenticator
 from just_kit.utils import *
 import json
 import time

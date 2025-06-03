@@ -2,13 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name="just_kit",
-    version="0.2.0",
+    version="0.2.1",
     packages=find_packages(),
     install_requires=[
         'requests',  # 用于发送HTTP请求
         'beautifulsoup4',  # 用于解析HTML
         'dotenv',
-        'PyExecJS',  # 用于执行JavaScript代码
         'pycryptodome'
     ],
     package_data={

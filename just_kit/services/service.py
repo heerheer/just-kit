@@ -1,6 +1,6 @@
-from ..auth import Authenticator
+from just_kit.auth import Authenticator
 import logging
-from ..utils import *
+from just_kit.utils import *
 
 class ServieProvider:
     def __init__(self,auth:Authenticator,service=''):
