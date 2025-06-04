@@ -162,13 +162,18 @@ class Authenticator:
         if os.path.exists(self.cookie_file):
             os.remove(self.cookie_file)
 
+    CHECK_URL = "http://my.just.edu.cn/"
+    CHECK_URL_VPN = "https://client.v.just.edu.cn/http/webvpn764a2e4853ae5e537560ba711c0f46bd/_s2/students_sy/main.psp"
+
     def check(self) -> bool:
+
+
         """
         检查登录是否失效
         :return: 如果登录有效返回True,否则返回False
         """
         res = self.session.get(
-            self.service,
+            self.CHECK_URL if not self.vpn else self.CHECK_URL_VPN,
             allow_redirects=False,
         )
         if res.status_code == 302 or res.status_code == 301:

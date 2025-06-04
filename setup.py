@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="just_kit",
-    version="0.2.1",
+    version="0.2.2",
     packages=find_packages(),
     install_requires=[
         'requests',  # 用于发送HTTP请求
@@ -10,9 +10,6 @@ setup(
         'dotenv',
         'pycryptodome'
     ],
-    package_data={
-        'just_kit': ['js/*'],
-    },
     author="Harmog",
     author_email="harmog@foxmail.com",
     description="江苏科技大学信息门户工具包",

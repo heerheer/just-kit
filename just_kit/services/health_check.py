@@ -46,10 +46,15 @@ class HealthCheckService(ServieProvider):
         return [HealthCheckData(score=float(item['score']), date=item['day']) for item in data]
 
     def login(self):
-        self.session.get(self.service_url())
+        resp = self.session.get(self.service_url())
+        if resp.url.endswith("welcome.do"):
+            self.logger.info("登录成功")
 
     def service_url(self) -> str:
         return self.SERVICE_URL_VPN2
 
     def data_url(self) -> str:
         return self.DATA_URL_VPN2
+
+    def check(self):
+        return self.check_url(self.service_url())

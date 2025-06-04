@@ -25,12 +25,17 @@ class EpayServiceProvider(ServieProvider):
         return self.SERVICE_URL_VPN if self.auth.vpn else self.SERVICE_URL
 
     def login(self):
-        self.session.get(self.service_url())
+        resp = self.session.get(self.service_url())
+        if resp.url.endswith("epay/"):
+            self.logger.info("登入成功")
+
+    def check(self):
+        return self.check_url(self.service_url())
 
     def query_electric_bill(self, room_no: int =4372, sys_id: int = 2, 
                           elc_area: int = 2, elc_buis: int = 4355) -> Optional[float]:
         """
-        查询电费
+        查询电费的剩余度数
         :param room_no: 房间号
         :param sys_id: 系统ID
         :param elc_area: 电力区域
