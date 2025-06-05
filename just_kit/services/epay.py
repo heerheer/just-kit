@@ -22,7 +22,7 @@ class EpayServiceProvider(ServieProvider):
         super().__init__(auth)
 
     def service_url(self) -> str:
-        return self.SERVICE_URL_VPN if self.auth.vpn else self.SERVICE_URL
+        return self.SERVICE_URL if self.auth.vpn else self.SERVICE_URL
 
     def login(self):
         resp = self.auth.session.get(self.service_url())

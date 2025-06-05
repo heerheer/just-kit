@@ -11,10 +11,9 @@ class Authenticator:
     '''
     用于登录信息门户的类
     '''
-    def __init__(self, service: str = "http://my.just.edu.cn/", debug=False,auto_login=True,vpn:bool=False):
+    def __init__(self, debug=False,auto_login=True,vpn:bool=False):
         '''
         初始化函数
-        :param service: 登录的服务,推荐使用默认值 http://my.just.edu.cn/
         :param debug: 是否开启调试模式
         :param auto_login: 是否自动读取保存的cookies以快速登录
         :param vpn: 是否使用vpn,若使用则会service使用 https://vpn2.just.edu.cn/
@@ -30,8 +29,10 @@ class Authenticator:
 
         # 基础信息
         self.vpn = vpn
+        self.service = "https://ids2.just.edu.cn/cas/login?service=http%3A%2F%2Fmy.just.edu.cn%2F" if vpn else "http://my.just.edu.cn/"
+        
         # 用于储存登入后的一些数据
-        self.service = 'https://ids2.just.edu.cn/cas/login?service=http%3A%2F%2Fmy.just.edu.cn%2F' if vpn else service
+        
         self.login_data = {}
         self.session = requests.Session()
         self.cookie_file = ".cookies_" + \
@@ -134,17 +135,6 @@ class Authenticator:
             if res.status_code == 302:
                 self.logger.info("登入成功")
                 self.save_cookies()
-                target = res.headers["Location"]
-
-                # debug
-                self.logger.debug(f"{res.status_code}->{abs_url(self.service,target)}")
-
-                res = session.get(
-                    abs_url(self.service,target),
-                )
-
-                # debug
-                self.logger.debug(res.status_code)
 
             else:
                 self.logger.error("登录失败")
