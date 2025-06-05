@@ -20,28 +20,36 @@ pip install just-kit
 ### 登入
 默认使用信息门户作为登入服务
 ```python
-from just_kit.auth import Authenticator
 import os
-from dotenv import load_dotenv
-# 读取.env
-load_dotenv()
-# 读取账户以及密码
-username = os.getenv('USER')
-password = os.getenv('PASSWORD')
-# 初始化认证器
-authenticator = Authenticator()
-authenticator.login(username,password)
+from just_kit.auth import Authenticator
+
+import dotenv
+dotenv.load_dotenv()
+
+auther = Authenticator(vpn=True,auto_login=False,debug=True)
+
+auther.login(
+    account=os.getenv("USER"),
+    password=os.getenv("PASSWORD"))
+```
+
+### 过期与重新登入
+
+```python
+auther.expire()
+if not auther.check():
+    print("重新登入：",auther.relogin()==0)
+else:
+    print("已登录")   
 ```
 
 ### 服务:Epay
 epay服务用于获取宿舍电费、用户校园卡余额和浴室专款
 ```python
-from just_kit.services import *
-# 认证器作为构造参数
-epay = EpayServiceProvider(authenticator)
-# 通过oauth登入epay的服务
+from just_kit.services import EpayServiceProvider
+epay = EpayServiceProvider(auther)
 epay.login()
-# 获取本账户校园卡余额与浴室专款
+epay.query_electric_bill()
 epay.query_account_bill()
 ```
 
@@ -49,18 +57,6 @@ epay.query_account_bill()
 ### 服务:HealthCheck
 宿舍卫生检查分数查询服务
 ```python
-import os
-from just_kit.auth import Authenticator
-
-import dotenv
-dotenv.load_dotenv()
-
-auther = Authenticator(vpn=True) #开启VPN模式
-
-auther.login(
-    account=os.getenv("USER"),
-    password=os.getenv("PASSWORD"))
-
 from just_kit.services import HealthCheckService
 service = HealthCheckService(auther)
 service.login()

@@ -1,6 +1,5 @@
 from just_kit.auth import Authenticator
 import logging
-from just_kit.utils import *
 
 class ServieProvider:
     def __init__(self,auth:Authenticator):
@@ -11,7 +10,7 @@ class ServieProvider:
     def check(self):
         pass
 
-    def check_url(self,service):
+    def check_url(self,service:str):
         """
         检查登录是否失效
         :return: 如果登录有效返回True,否则返回False

@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from .service import ServieProvider
-from ..auth import Authenticator
+from just_kit.auth import Authenticator
 
 
 class EpayServiceProvider(ServieProvider):

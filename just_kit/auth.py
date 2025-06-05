@@ -11,7 +11,7 @@ class Authenticator:
     '''
     用于登录信息门户的类
     '''
-    def __init__(self, debug=False,auto_login=True,vpn:bool=False):
+    def __init__(self, debug=False,auto_login=True,vpn:bool=True):
         '''
         初始化函数
         :param debug: 是否开启调试模式
@@ -35,14 +35,8 @@ class Authenticator:
         
         self.login_data = {}
         self.session = requests.Session()
-        self.cookie_file = ".cookies_" + \
-            self.service.replace('http://', "").replace('/', '_') + ".pkl"  # 根据service生成唯一的cookie文件名
-        self.headers = {
-            "Connection": "keep-alive",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0",
-        }
+        self.cookie_file = ".cookies_saved.pkl"  # 根据service生成唯一的cookie文件名
+
         self.ignore_cookies = ['Location']  # 要忽略的 cookie 名列表
         self.auto_login=auto_login
         if auto_login:
@@ -89,6 +83,12 @@ class Authenticator:
 
     def login(self, account: str, password: str):
 
+        self.login_data = {
+            "username": account,
+            "password": password,
+        }
+
+
         if self.check():
             self.logger.info("已登录")
             return
@@ -99,7 +99,7 @@ class Authenticator:
         :param password: 密码
         """
         with self.session as session:
-
+            
             # 直接访问service进行自动跳转?
             res = session.get(
                 self.service,
@@ -126,6 +126,7 @@ class Authenticator:
                 "execution": execution_value,
             }
 
+
             # login
             res = session.post(
                 target,
@@ -136,7 +137,6 @@ class Authenticator:
                 self.logger.info("登入成功")
                 self.save_cookies()
                 session.get(res.headers["Location"])
-
             else:
                 self.logger.error("登录失败")
                 return -1
@@ -167,3 +167,10 @@ class Authenticator:
         print(res.url)
         print(res.headers)
         return res.status_code == 200
+    
+    def relogin(self):
+        """
+        重新登录
+        """
+        self.expire()
+        return self.login(self.login_data["username"], self.login_data["password"])

@@ -1,4 +1,4 @@
-from just_kit.services.service import ServieProvider
+from .service import ServieProvider
 from just_kit.auth import Authenticator
 from just_kit.utils import *
 import json
