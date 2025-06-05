@@ -25,7 +25,7 @@ class EpayServiceProvider(ServieProvider):
         return self.SERVICE_URL_VPN if self.auth.vpn else self.SERVICE_URL
 
     def login(self):
-        resp = self.session.get(self.service_url())
+        resp = self.auth.session.get(self.service_url())
         if resp.url.endswith("epay/"):
             self.logger.info("登入成功")
 

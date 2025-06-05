@@ -13,9 +13,9 @@ class HealthCheckData:
 
 
 class HealthCheckService(ServieProvider):
-    DATA_URL_VPN2 = 'https://client.v.just.edu.cn/http/webvpne91b803d1eab022343a8c030c9b2c501b81b175bce29237caa6872c79689dc1c/sg/wechat/healthCheck.jsp'
+    DATA_URL_VPN2 = 'http://hqgy.just.edu.cn/sg/wechat/healthCheck.jsp'
 
-    SERVICE_URL_VPN2 = 'https://client.v.just.edu.cn/http/webvpne91b803d1eab022343a8c030c9b2c501b81b175bce29237caa6872c79689dc1c/CASLogin'
+    SERVICE_URL_VPN2 = 'http://hqgy.just.edu.cn/CASLogin'
 
     def __init__(self, auth: Authenticator):
         super().__init__(auth)
@@ -46,7 +46,7 @@ class HealthCheckService(ServieProvider):
         return [HealthCheckData(score=float(item['score']), date=item['day']) for item in data]
 
     def login(self):
-        resp = self.session.get(self.service_url())
+        resp = self.auth.session.get(self.service_url())
         if resp.url.endswith("welcome.do"):
             self.logger.info("登录成功")
 

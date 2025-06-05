@@ -31,7 +31,7 @@ class Authenticator:
         # 基础信息
         self.vpn = vpn
         # 用于储存登入后的一些数据
-        self.service = 'https://vpn2.just.edu.cn' if vpn else service
+        self.service = 'https://ids2.just.edu.cn/cas/login?service=http%3A%2F%2Fmy.just.edu.cn%2F' if vpn else service
         self.login_data = {}
         self.session = requests.Session()
         self.cookie_file = ".cookies_" + \
@@ -138,7 +138,6 @@ class Authenticator:
 
                 # debug
                 self.logger.debug(f"{res.status_code}->{abs_url(self.service,target)}")
-                self.logger.debug(session.cookies.get_dict())
 
                 res = session.get(
                     abs_url(self.service,target),
@@ -146,7 +145,6 @@ class Authenticator:
 
                 # debug
                 self.logger.debug(res.status_code)
-                self.logger.debug(session.cookies.get_dict())
 
             else:
                 self.logger.error("登录失败")
@@ -167,16 +165,13 @@ class Authenticator:
 
     def check(self) -> bool:
 
-
         """
         检查登录是否失效
         :return: 如果登录有效返回True,否则返回False
         """
         res = self.session.get(
-            self.CHECK_URL if not self.vpn else self.CHECK_URL_VPN,
+            self.CHECK_URL ,
             allow_redirects=False,
         )
-        if res.status_code == 302 or res.status_code == 301:
-            return False
-        else:
-            return True
+        print(res.url)
+        return res.status_code == 200
