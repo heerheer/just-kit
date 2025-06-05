@@ -135,6 +135,7 @@ class Authenticator:
             if res.status_code == 302:
                 self.logger.info("登入成功")
                 self.save_cookies()
+                session.get(res.headers["Location"])
 
             else:
                 self.logger.error("登录失败")
@@ -164,4 +165,5 @@ class Authenticator:
             allow_redirects=False,
         )
         print(res.url)
+        print(res.headers)
         return res.status_code == 200
