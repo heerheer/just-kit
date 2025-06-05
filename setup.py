@@ -13,7 +13,7 @@ setup(
     author="Harmog",
     author_email="harmog@foxmail.com",
     description="江苏科技大学信息门户工具包",
-    long_description=open('README.md').read(),
+    long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type="text/markdown",
     url="https://github.com/heerheer/just-kit",
     # classifiers=[
